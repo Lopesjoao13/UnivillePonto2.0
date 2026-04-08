@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 public class Departamento {
     @Id
     @GeneratedValue
-    private long idDepartamento;
+    private Long idDepartamento;
     private String nomeDepartamento;
 
-    public long getIdDepartamento() {
+    public Departamento(){}
+
+    public Long getIdDepartamento() {
         return idDepartamento;
     }
 

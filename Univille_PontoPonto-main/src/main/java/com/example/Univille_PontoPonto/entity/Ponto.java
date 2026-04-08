@@ -7,13 +7,15 @@ import java.time.LocalDateTime;
 public class Ponto {
     @Id
     @GeneratedValue
-    private long idPonto;
+    private Long idPonto;
     private LocalDateTime dataHora;
     @ManyToOne
     @JoinColumn(name="idFuncionario")
     private Funcionario funcionarioPonto;
 
-    public long getIdPonto() {
+    public Ponto(){}
+
+    public Long getIdPonto() {
         return idPonto;
     }
 

@@ -6,14 +6,16 @@ import jakarta.persistence.*;
 public class Funcionario {
     @Id
     @GeneratedValue
-    private long idFuncionario;
+    private Long idFuncionario;
     private String nomeFuncionario;
     private String matricula;
     @ManyToOne
     @JoinColumn(name = "idDepartamento")
     private Departamento departamentoFuncionario;
 
-    public long getIdFuncionario() {
+    public Funcionario(){}
+
+    public Long getIdFuncionario() {
         return idFuncionario;
     }
 
