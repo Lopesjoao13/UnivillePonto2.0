@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 public class Funcionario {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFuncionario;
     private String nomeFuncionario;
     private String matricula;

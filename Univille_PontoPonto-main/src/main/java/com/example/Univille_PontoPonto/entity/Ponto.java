@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 @Entity
 public class Ponto {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPonto;
     private LocalDateTime dataHora;
     @ManyToOne

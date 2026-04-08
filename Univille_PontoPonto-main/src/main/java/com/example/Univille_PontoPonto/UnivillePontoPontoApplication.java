@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
@@ -34,7 +35,7 @@ public class UnivillePontoPontoApplication {
             funrepo.save(func);
 
             var pont = new Ponto();
-            String data = "2026-04-08T14:20:00";
+            String data = "2026-04-08T20:12:00";
             pont.setDataHora(LocalDateTime.parse(data));
             pont.setFuncionarioPonto(func);
             ponrepo.save(pont);
