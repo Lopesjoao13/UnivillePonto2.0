@@ -10,19 +10,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootApplication
 public class UnivillePontoPontoApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(UnivillePontoPontoApplication.class, args);
     }
 
     @Bean
-    public CommandLineRunner runner(DepartamentoRepository deprepo, FuncionarioRepository funrepo, PontoRepository ponrepo){
+    public CommandLineRunner runner(DepartamentoRepository deprepo, FuncionarioRepository funrepo, PontoRepository ponrepo) {
         return (args) -> {
             var dep = new Departamento();
             dep.setNomeDepartamento("Desenvolvimento");
@@ -35,11 +35,23 @@ public class UnivillePontoPontoApplication {
             funrepo.save(func);
 
             var pont = new Ponto();
-            String data = "2026-04-08T20:12:00";
-            pont.setDataHora(LocalDateTime.parse(data));
+            LocalDateTime agora = LocalDateTime.now();
+            pont.setDataHora(agora);
             pont.setFuncionarioPonto(func);
             ponrepo.save(pont);
+
+            List<Ponto> pontos = ponrepo.buscarPonto(1L,LocalDateTime.parse("2026-04-08T00:00:00"));
+
+            if(pontos.isEmpty()){
+                System.out.println("Nenhum ponto encontrado.");
+            } else {
+                pontos.forEach(p -> {
+                    System.out.println("------------------------------------------");
+                    System.out.println("Funcionário: " + p.getFuncionarioPonto().getNomeFuncionario());
+                    System.out.println("Departamento: " + p.getFuncionarioPonto().getDepartamentoFuncionario().getNomeDepartamento());
+                    System.out.println("Data/Hora: " + p.getDataHora());
+                });
+            }
         };
     }
-
 }
