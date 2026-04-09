@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class UnivillePontoPontoApplication {
     @Bean
     public CommandLineRunner runner(DepartamentoRepository deprepo, FuncionarioRepository funrepo, PontoRepository ponrepo) {
         return (args) -> {
+            // 1. Criar e Salvar
             var dep = new Departamento();
             dep.setNomeDepartamento("Desenvolvimento");
             deprepo.save(dep);
@@ -34,23 +36,64 @@ public class UnivillePontoPontoApplication {
             func.setDepartamentoFuncionario(dep);
             funrepo.save(func);
 
-            var pont = new Ponto();
-            LocalDateTime agora = LocalDateTime.now();
-            pont.setDataHora(agora);
-            pont.setFuncionarioPonto(func);
-            ponrepo.save(pont);
+            // 2. Registrar Entrada (8:00)
+            var entrada = new Ponto();
+            entrada.setDataHora(LocalDateTime.parse("2026-04-08T08:00:00"));
+            entrada.setFuncionarioPonto(func);
+            ponrepo.save(entrada);
 
-            List<Ponto> pontos = ponrepo.buscarPonto(1L,LocalDateTime.parse("2026-04-08T00:00:00"));
+            // 3. Registrar Saída (12:00)
+            var saida = new Ponto();
+            saida.setDataHora(LocalDateTime.parse("2026-04-08T12:00:00"));
+            saida.setFuncionarioPonto(func);
+            ponrepo.save(saida);
 
-            if(pontos.isEmpty()){
+            // 4. Buscar usando o ID gerado pelo banco para o Eduardo
+            List<Ponto> pontos = ponrepo.buscarPonto(func.getIdFuncionario(), LocalDateTime.parse("2026-04-08T00:00:00"));
+
+            if (pontos.isEmpty()) {
                 System.out.println("Nenhum ponto encontrado.");
             } else {
-                pontos.forEach(p -> {
-                    System.out.println("------------------------------------------");
-                    System.out.println("Funcionário: " + p.getFuncionarioPonto().getNomeFuncionario());
-                    System.out.println("Departamento: " + p.getFuncionarioPonto().getDepartamentoFuncionario().getNomeDepartamento());
-                    System.out.println("Data/Hora: " + p.getDataHora());
-                });
+                StringBuilder linhas = new StringBuilder();
+                long totalMinutos = 0;
+
+                for (int i = 0; i < pontos.size(); i += 2) {
+                    LocalDateTime ent = pontos.get(i).getDataHora();
+                    String strEnt = String.format("%02d:%02d", ent.getHour(), ent.getMinute());
+                    String strSai = "--:--";
+                    String strDur = "00:00";
+
+                    if (i + 1 < pontos.size()) {
+                        LocalDateTime sai = pontos.get(i + 1).getDataHora();
+                        strSai = String.format("%02d:%02d", sai.getHour(), sai.getMinute());
+
+                        Duration d = Duration.between(ent, sai);
+                        totalMinutos += d.toMinutes();
+                        strDur = String.format("%02d:%02d", d.toMinutes() / 60, d.toMinutes() % 60);
+                    }
+                    linhas.append(String.format("%-9s %-7s %s\n", strEnt, strSai, strDur));
+                }
+
+                // O PRINT FORMATADO QUE VOCÊ PEDIU:
+                System.out.printf("""
+                    
+                    RELATÓRIO DE PONTO
+                    Funcionário  : %s
+                    Departamento : %s
+                    Data         : %s
+                    
+                    Entrada   Saída   Horas
+                    ----------------------------
+                    %s----------------------------
+                    Total trabalhado : %02d:%02d
+                    
+                    """,
+                        func.getNomeFuncionario(),
+                        dep.getNomeDepartamento(),
+                        pontos.get(0).getDataHora().toLocalDate(),
+                        linhas.toString(),
+                        totalMinutos / 60,
+                        totalMinutos % 60);
             }
         };
     }
